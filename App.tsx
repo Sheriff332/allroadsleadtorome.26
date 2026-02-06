@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useMemo } from 'react';
 import { FLOWCHART_STEPS } from './constants';
 import { StepId } from './types';
@@ -17,15 +16,15 @@ const App: React.FC = () => {
     setTimeout(() => setIsPanning(false), 800);
   }, []);
 
-  const getButtonClass = (variant?: string, isActive?: boolean) => {
-    const base = "px-6 py-3 rounded-full font-bold transition-all duration-300 text-sm md:text-base border-2 active:scale-95";
+  const getButtonClass = (variant?: string) => {
+    const base = 'px-6 py-3 rounded-full font-bold transition-all duration-300 text-sm md:text-base border active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed';
     if (variant === 'primary') {
-      return `${base} bg-pink-500 border-pink-500 text-white hover:bg-pink-600 hover:border-pink-600 shadow-lg shadow-pink-200`;
+      return `${base} bg-fuchsia-600 border-fuchsia-500/90 text-white hover:bg-fuchsia-500 shadow-[0_8px_28px_rgba(232,121,249,0.35)]`;
     }
     if (variant === 'danger') {
-      return `${base} bg-white border-slate-200 text-slate-400 hover:border-pink-200 hover:text-pink-400`;
+      return `${base} bg-slate-900/70 border-sky-900 text-slate-300 hover:border-sky-700 hover:text-sky-200`;
     }
-    return `${base} bg-white border-pink-100 text-pink-500 hover:bg-pink-50`;
+    return `${base} bg-slate-900/70 border-fuchsia-900 text-fuchsia-300 hover:border-fuchsia-600 hover:text-fuchsia-200`;
   };
 
   const connections = useMemo(() => {
@@ -53,24 +52,18 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 bg-[#fff5f7] overflow-hidden select-none">
+    <div className="fixed inset-0 overflow-hidden select-none bg-[radial-gradient(circle_at_top,#350012_0%,#1a000a_40%,#09020a_100%)] text-slate-100">
       <FloatingHearts />
 
-      <div className="fixed top-6 left-6 z-50 pointer-events-none">
-        <div className="h-12 w-12 rounded-2xl bg-white/70 backdrop-blur-md border border-white shadow-md flex items-center justify-center text-pink-500 text-2xl">
-          💌
-        </div>
-      </div>
-      
-      <div 
-        className="absolute inset-0 flex items-center justify-center pointer-events-none" 
+      <div
+        className="absolute inset-0 flex items-center justify-center pointer-events-none"
         style={cameraTransform}
       >
-        <svg className="absolute overflow-visible w-full h-full opacity-20">
+        <svg className="absolute overflow-visible w-full h-full opacity-30">
           <defs>
             <linearGradient id="heartGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#ec4899" />
-              <stop offset="100%" stopColor="#f43f5e" />
+              <stop offset="0%" stopColor="#7f1d1d" />
+              <stop offset="100%" stopColor="#be185d" />
             </linearGradient>
           </defs>
           {connections.map((line) => (
@@ -82,7 +75,7 @@ const App: React.FC = () => {
               y2={line.y2}
               stroke="url(#heartGradient)"
               strokeWidth="2"
-              strokeDasharray="4 4"
+              strokeDasharray="5 6"
             />
           ))}
         </svg>
@@ -99,16 +92,14 @@ const App: React.FC = () => {
                 top: step.position.y - 150,
               }}
             >
-              <div className={`p-8 bg-white/80 backdrop-blur-xl rounded-[2.5rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-white transition-all duration-500
-                ${isActive ? 'ring-4 ring-pink-100' : ''}`}>
-                
-                {/* Content Wrapper for Blur Effect */}
+              <div className={`p-8 bg-slate-900/75 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_32px_80px_-20px_rgba(0,0,0,0.8)] border border-fuchsia-200/10 transition-all duration-500
+                ${isActive ? 'ring-2 ring-fuchsia-500/25' : ''}`}>
                 <div className={`transition-all duration-500 ${!isActive ? 'blur-md grayscale' : 'blur-0'}`}>
                   {step.id === 'success' && (
-                    <div className="mb-6 rounded-3xl overflow-hidden h-48 w-full bg-pink-100">
-                      <img 
+                    <div className="mb-6 rounded-3xl overflow-hidden h-48 w-full bg-slate-800 border border-fuchsia-400/20">
+                      <img
                         src={specialMomentImage}
-                        className="w-full h-full object-cover" 
+                        className="w-full h-full object-cover"
                         alt="Our Special Moment"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src = 'https://via.placeholder.com/800x600?text=Image+Not+Found';
@@ -117,12 +108,12 @@ const App: React.FC = () => {
                     </div>
                   )}
 
-                  <h2 className={`text-2xl font-black text-slate-800 leading-tight mb-3 ${step.id === 'success' ? 'font-cursive text-3xl text-pink-600' : ''}`}>
+                  <h2 className={`text-2xl font-black text-slate-100 leading-tight mb-3 ${step.id === 'success' ? 'font-cursive text-3xl text-fuchsia-300' : ''}`}>
                     {step.question}
                   </h2>
 
                   {step.description && (
-                    <p className="text-slate-500 text-sm mb-6 leading-relaxed">
+                    <p className="text-slate-300 text-sm mb-6 leading-relaxed">
                       {step.description}
                     </p>
                   )}
@@ -133,7 +124,7 @@ const App: React.FC = () => {
                         key={i}
                         disabled={!isActive || isPanning}
                         onClick={() => handleStepChange(opt.next)}
-                        className={getButtonClass(opt.variant, isActive)}
+                        className={getButtonClass(opt.variant)}
                       >
                         {opt.label}
                       </button>
@@ -147,16 +138,10 @@ const App: React.FC = () => {
       </div>
 
       <div className="fixed top-8 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
-        <div className="px-6 py-2 bg-white/50 backdrop-blur-md rounded-full border border-white/50 text-pink-500 font-bold text-sm tracking-tight flex items-center gap-3 shadow-sm">
+        <div className="px-6 py-2 bg-slate-950/60 backdrop-blur-md rounded-full border border-fuchsia-100/15 text-fuchsia-300 font-bold text-sm tracking-tight shadow-sm">
           Made with 💖 by yours truly
         </div>
       </div>
-
-      <footer className="fixed bottom-6 w-full text-center z-50 pointer-events-none">
-        <p className="text-pink-300 text-xs font-semibold uppercase tracking-[0.2em] opacity-80">
-          made with heart by yours truly
-        </p>
-      </footer>
     </div>
   );
 };
