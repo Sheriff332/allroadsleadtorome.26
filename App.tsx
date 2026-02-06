@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { FLOWCHART_STEPS } from './constants';
 import { StepId } from './types';
 import FloatingHearts from './components/FloatingHearts';
@@ -7,12 +7,43 @@ import specialMomentImage from './WhatsApp Image 2025-12-20 at 5.47.57 PM.jpeg';
 const App: React.FC = () => {
   const [currentStepId, setCurrentStepId] = useState<StepId>('start');
   const [isPanning, setIsPanning] = useState(false);
+  const [hasGameStarted, setHasGameStarted] = useState(false);
+  const [visitedSteps, setVisitedSteps] = useState<Set<StepId>>(new Set(['start']));
+  const [showAllNodesCelebration, setShowAllNodesCelebration] = useState(false);
 
   const currentStep = FLOWCHART_STEPS[currentStepId];
+  const totalNodes = Object.keys(FLOWCHART_STEPS).length;
+  const discoveredCount = visitedSteps.size;
+  const allNodesDiscovered = discoveredCount === totalNodes;
+
+  const celebrationHearts = useMemo(
+    () => Array.from({ length: 32 }, (_, idx) => ({
+      id: idx,
+      left: Math.random() * 100,
+      delay: Math.random() * 0.9,
+      size: 16 + Math.random() * 22,
+      drift: -40 + Math.random() * 80
+    })),
+    []
+  );
+
+  useEffect(() => {
+    if (allNodesDiscovered) {
+      setShowAllNodesCelebration(true);
+      const timeout = setTimeout(() => setShowAllNodesCelebration(false), 2500);
+      return () => clearTimeout(timeout);
+    }
+  }, [allNodesDiscovered]);
 
   const handleStepChange = useCallback((nextId: StepId) => {
     setIsPanning(true);
     setCurrentStepId(nextId);
+    setVisitedSteps((prev) => {
+      const updated = new Set(prev);
+      updated.add(nextId);
+      return updated;
+    });
+
     setTimeout(() => setIsPanning(false), 800);
   }, []);
 
@@ -55,8 +86,39 @@ const App: React.FC = () => {
     <div className="fixed inset-0 overflow-hidden select-none bg-[radial-gradient(circle_at_top,#350012_0%,#1a000a_40%,#09020a_100%)] text-slate-100">
       <FloatingHearts />
 
+      {!hasGameStarted && (
+        <button
+          onClick={() => setHasGameStarted(true)}
+          className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950/25 backdrop-blur-md text-fuchsia-200 text-lg md:text-xl font-bold tracking-wide transition-colors hover:text-fuchsia-100"
+        >
+          Press anywhere to start 💌
+        </button>
+      )}
+
+      {showAllNodesCelebration && (
+        <div className="fixed inset-0 z-[75] pointer-events-none overflow-hidden">
+          {celebrationHearts.map((heart) => (
+            <span
+              key={heart.id}
+              className="absolute top-[-12%] text-fuchsia-300/90 animate-[heart-shower_1.8s_ease-out_forwards]"
+              style={{
+                left: `${heart.left}%`,
+                animationDelay: `${heart.delay}s`,
+                fontSize: `${heart.size}px`,
+                ['--heart-drift' as '--heart-drift']: `${heart.drift}px`
+              }}
+            >
+              ❤️
+            </span>
+          ))}
+          <div className="absolute bottom-20 left-1/2 -translate-x-1/2 px-5 py-2 rounded-full bg-fuchsia-700/30 border border-fuchsia-200/25 text-fuchsia-100 font-bold text-sm backdrop-blur-sm">
+            All nodes discovered 💖
+          </div>
+        </div>
+      )}
+
       <div
-        className="absolute inset-0 flex items-center justify-center pointer-events-none"
+        className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-500 ${hasGameStarted ? 'blur-0' : 'blur-sm'}`}
         style={cameraTransform}
       >
         <svg className="absolute overflow-visible w-full h-full opacity-30">
@@ -122,7 +184,7 @@ const App: React.FC = () => {
                     {step.options.map((opt, i) => (
                       <button
                         key={i}
-                        disabled={!isActive || isPanning}
+                        disabled={!isActive || isPanning || !hasGameStarted}
                         onClick={() => handleStepChange(opt.next)}
                         className={getButtonClass(opt.variant)}
                       >
@@ -137,11 +199,28 @@ const App: React.FC = () => {
         })}
       </div>
 
-      <div className="fixed top-8 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
         <div className="px-6 py-2 bg-slate-950/60 backdrop-blur-md rounded-full border border-fuchsia-100/15 text-fuchsia-300 font-bold text-sm tracking-tight shadow-sm">
-          Made with 💖 by yours truly
+          Made with 💖 by yours truly ✨
         </div>
       </div>
+
+
+      <style>{`
+        @keyframes heart-shower {
+          0% {
+            transform: translate3d(0, -12vh, 0) rotate(0deg);
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          100% {
+            transform: translate3d(var(--heart-drift), 115vh, 0) rotate(420deg);
+            opacity: 0;
+          }
+        }
+      `}</style>
     </div>
   );
 };
