@@ -47,6 +47,13 @@ const App: React.FC = () => {
     setTimeout(() => setIsPanning(false), 800);
   }, []);
 
+  const handleRestart = useCallback(() => {
+    setCurrentStepId('start');
+    setVisitedSteps(new Set(['start']));
+    setShowCelebration(false);
+    setHasGameStarted(false);
+  }, []);
+
   const getButtonClass = (variant?: string) => {
     const base = 'px-6 py-3 rounded-full font-bold transition-all duration-300 text-sm md:text-base border active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed';
     if (variant === 'primary') {
@@ -111,7 +118,7 @@ const App: React.FC = () => {
               ❤️
             </span>
           ))}
-          <div className="absolute bottom-20 left-1/2 -translate-x-1/2 px-5 py-2 rounded-full bg-fuchsia-700/30 border border-fuchsia-200/25 text-fuchsia-100 font-bold text-sm backdrop-blur-sm">
+          <div className="absolute top-20 left-1/2 -translate-x-1/2 px-5 py-2 rounded-full bg-fuchsia-700/30 border border-fuchsia-200/25 text-fuchsia-100 font-bold text-sm backdrop-blur-sm">
             All nodes discovered 💖
           </div>
         </div>
@@ -201,10 +208,21 @@ const App: React.FC = () => {
 
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
         <div className="px-6 py-2 bg-slate-950/60 backdrop-blur-md rounded-full border border-fuchsia-100/15 text-fuchsia-300 font-bold text-sm tracking-tight shadow-sm">
-          Made with 💖 by yours truly ✨
+          Mission Progress: {visitedSteps.size}/{Object.keys(FLOWCHART_STEPS).length} nodes discovered
         </div>
       </div>
 
+      <div className="fixed bottom-6 right-6 z-50 pointer-events-none">
+        <div className="px-4 py-2 bg-slate-950/60 backdrop-blur-md rounded-full border border-fuchsia-100/15 text-fuchsia-300 font-semibold text-xs md:text-sm tracking-tight shadow-sm">
+          Nodes discovered: {visitedSteps.size}/{Object.keys(FLOWCHART_STEPS).length}
+        </div>
+      </div>
+
+      <div className="fixed bottom-6 right-6 z-50 pointer-events-none">
+        <div className="px-4 py-2 bg-slate-950/60 backdrop-blur-md rounded-full border border-fuchsia-100/15 text-fuchsia-300 font-semibold text-xs md:text-sm tracking-tight shadow-sm">
+          Nodes discovered: {discoveredCount}/{totalNodes}
+        </div>
+      </div>
 
       <style>{`
         @keyframes heart-shower {
