@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { FLOWCHART_STEPS } from './constants';
 import { StepId } from './types';
 import FloatingHearts from './components/FloatingHearts';
@@ -9,8 +9,31 @@ const App: React.FC = () => {
   const [isPanning, setIsPanning] = useState(false);
   const [hasGameStarted, setHasGameStarted] = useState(false);
   const [visitedSteps, setVisitedSteps] = useState<Set<StepId>>(new Set(['start']));
+  const [showAllNodesCelebration, setShowAllNodesCelebration] = useState(false);
 
   const currentStep = FLOWCHART_STEPS[currentStepId];
+  const totalNodes = Object.keys(FLOWCHART_STEPS).length;
+  const discoveredCount = visitedSteps.size;
+  const allNodesDiscovered = discoveredCount === totalNodes;
+
+  const celebrationHearts = useMemo(
+    () => Array.from({ length: 32 }, (_, idx) => ({
+      id: idx,
+      left: Math.random() * 100,
+      delay: Math.random() * 0.9,
+      size: 16 + Math.random() * 22,
+      drift: -40 + Math.random() * 80
+    })),
+    []
+  );
+
+  useEffect(() => {
+    if (allNodesDiscovered) {
+      setShowAllNodesCelebration(true);
+      const timeout = setTimeout(() => setShowAllNodesCelebration(false), 2500);
+      return () => clearTimeout(timeout);
+    }
+  }, [allNodesDiscovered]);
 
   const handleStepChange = useCallback((nextId: StepId) => {
     setIsPanning(true);
@@ -77,6 +100,28 @@ const App: React.FC = () => {
         >
           Press anywhere to start 💌
         </button>
+      )}
+
+      {showAllNodesCelebration && (
+        <div className="fixed inset-0 z-[75] pointer-events-none overflow-hidden">
+          {celebrationHearts.map((heart) => (
+            <span
+              key={heart.id}
+              className="absolute top-[-12%] text-fuchsia-300/90 animate-[heart-shower_1.8s_ease-out_forwards]"
+              style={{
+                left: `${heart.left}%`,
+                animationDelay: `${heart.delay}s`,
+                fontSize: `${heart.size}px`,
+                ['--heart-drift' as '--heart-drift']: `${heart.drift}px`
+              }}
+            >
+              ❤️
+            </span>
+          ))}
+          <div className="absolute top-20 left-1/2 -translate-x-1/2 px-5 py-2 rounded-full bg-fuchsia-700/30 border border-fuchsia-200/25 text-fuchsia-100 font-bold text-sm backdrop-blur-sm">
+            All nodes discovered 💖
+          </div>
+        </div>
       )}
 
       <div
@@ -172,6 +217,28 @@ const App: React.FC = () => {
           Nodes discovered: {visitedSteps.size}/{Object.keys(FLOWCHART_STEPS).length}
         </div>
       </div>
+
+      <div className="fixed bottom-6 right-6 z-50 pointer-events-none">
+        <div className="px-4 py-2 bg-slate-950/60 backdrop-blur-md rounded-full border border-fuchsia-100/15 text-fuchsia-300 font-semibold text-xs md:text-sm tracking-tight shadow-sm">
+          Nodes discovered: {discoveredCount}/{totalNodes}
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes heart-shower {
+          0% {
+            transform: translate3d(0, -12vh, 0) rotate(0deg);
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          100% {
+            transform: translate3d(var(--heart-drift), 115vh, 0) rotate(420deg);
+            opacity: 0;
+          }
+        }
+      `}</style>
     </div>
   );
 };
