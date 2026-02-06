@@ -3,6 +3,7 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { FLOWCHART_STEPS } from './constants';
 import { StepId } from './types';
 import FloatingHearts from './components/FloatingHearts';
+import specialMomentImage from './WhatsApp Image 2025-12-20 at 5.47.57 PM.jpeg';
 
 const App: React.FC = () => {
   const [currentStepId, setCurrentStepId] = useState<StepId>('start');
@@ -54,6 +55,12 @@ const App: React.FC = () => {
   return (
     <div className="fixed inset-0 bg-[#fff5f7] overflow-hidden select-none">
       <FloatingHearts />
+
+      <div className="fixed top-6 left-6 z-50 pointer-events-none">
+        <div className="h-12 w-12 rounded-2xl bg-white/70 backdrop-blur-md border border-white shadow-md flex items-center justify-center text-pink-500 text-2xl">
+          💌
+        </div>
+      </div>
       
       <div 
         className="absolute inset-0 flex items-center justify-center pointer-events-none" 
@@ -100,7 +107,7 @@ const App: React.FC = () => {
                   {step.id === 'success' && (
                     <div className="mb-6 rounded-3xl overflow-hidden h-48 w-full bg-pink-100">
                       <img 
-                        src="WhatsApp Image 2025-12-20 at 5.47.57 PM.jpeg" 
+                        src={specialMomentImage}
                         className="w-full h-full object-cover" 
                         alt="Our Special Moment"
                         onError={(e) => {
