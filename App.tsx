@@ -7,12 +7,20 @@ import specialMomentImage from './WhatsApp Image 2025-12-20 at 5.47.57 PM.jpeg';
 const App: React.FC = () => {
   const [currentStepId, setCurrentStepId] = useState<StepId>('start');
   const [isPanning, setIsPanning] = useState(false);
+  const [hasGameStarted, setHasGameStarted] = useState(false);
+  const [visitedSteps, setVisitedSteps] = useState<Set<StepId>>(new Set(['start']));
 
   const currentStep = FLOWCHART_STEPS[currentStepId];
 
   const handleStepChange = useCallback((nextId: StepId) => {
     setIsPanning(true);
     setCurrentStepId(nextId);
+    setVisitedSteps((prev) => {
+      const updated = new Set(prev);
+      updated.add(nextId);
+      return updated;
+    });
+
     setTimeout(() => setIsPanning(false), 800);
   }, []);
 
@@ -55,8 +63,17 @@ const App: React.FC = () => {
     <div className="fixed inset-0 overflow-hidden select-none bg-[radial-gradient(circle_at_top,#350012_0%,#1a000a_40%,#09020a_100%)] text-slate-100">
       <FloatingHearts />
 
+      {!hasGameStarted && (
+        <button
+          onClick={() => setHasGameStarted(true)}
+          className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950/25 backdrop-blur-md text-fuchsia-200 text-lg md:text-xl font-bold tracking-wide transition-colors hover:text-fuchsia-100"
+        >
+          Press anywhere to start 💌
+        </button>
+      )}
+
       <div
-        className="absolute inset-0 flex items-center justify-center pointer-events-none"
+        className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-500 ${hasGameStarted ? 'blur-0' : 'blur-sm'}`}
         style={cameraTransform}
       >
         <svg className="absolute overflow-visible w-full h-full opacity-30">
@@ -122,7 +139,7 @@ const App: React.FC = () => {
                     {step.options.map((opt, i) => (
                       <button
                         key={i}
-                        disabled={!isActive || isPanning}
+                        disabled={!isActive || isPanning || !hasGameStarted}
                         onClick={() => handleStepChange(opt.next)}
                         className={getButtonClass(opt.variant)}
                       >
@@ -140,6 +157,12 @@ const App: React.FC = () => {
       <div className="fixed top-8 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
         <div className="px-6 py-2 bg-slate-950/60 backdrop-blur-md rounded-full border border-fuchsia-100/15 text-fuchsia-300 font-bold text-sm tracking-tight shadow-sm">
           Made with 💖 by yours truly
+        </div>
+      </div>
+
+      <div className="fixed bottom-6 right-6 z-50 pointer-events-none">
+        <div className="px-4 py-2 bg-slate-950/60 backdrop-blur-md rounded-full border border-fuchsia-100/15 text-fuchsia-300 font-semibold text-xs md:text-sm tracking-tight shadow-sm">
+          Nodes discovered: {visitedSteps.size}/{Object.keys(FLOWCHART_STEPS).length}
         </div>
       </div>
     </div>
