@@ -47,6 +47,13 @@ const App: React.FC = () => {
     setTimeout(() => setIsPanning(false), 800);
   }, []);
 
+  const handleRestart = useCallback(() => {
+    setCurrentStepId('start');
+    setVisitedSteps(new Set(['start']));
+    setShowCelebration(false);
+    setHasGameStarted(false);
+  }, []);
+
   const getButtonClass = (variant?: string) => {
     const base = 'px-6 py-3 rounded-full font-bold transition-all duration-300 text-sm md:text-base border active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed';
     if (variant === 'primary') {
