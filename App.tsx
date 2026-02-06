@@ -8,7 +8,6 @@ const App: React.FC = () => {
   const [currentStepId, setCurrentStepId] = useState<StepId>('start');
   const [isPanning, setIsPanning] = useState(false);
   const [hasGameStarted, setHasGameStarted] = useState(false);
-  const [showCelebration, setShowCelebration] = useState(false);
   const [visitedSteps, setVisitedSteps] = useState<Set<StepId>>(new Set(['start']));
 
   const currentStep = FLOWCHART_STEPS[currentStepId];
@@ -21,10 +20,6 @@ const App: React.FC = () => {
       updated.add(nextId);
       return updated;
     });
-
-    if (nextId === 'success') {
-      setShowCelebration(true);
-    }
 
     setTimeout(() => setIsPanning(false), 800);
   }, []);
@@ -76,43 +71,16 @@ const App: React.FC = () => {
       <FloatingHearts />
 
       {!hasGameStarted && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950/70 backdrop-blur-sm px-4">
-          <div className="w-full max-w-xl rounded-[2.5rem] border border-fuchsia-200/20 bg-slate-900/85 p-8 text-center shadow-[0_32px_80px_-20px_rgba(0,0,0,0.8)]">
-            <p className="text-fuchsia-300 font-semibold tracking-[0.2em] uppercase text-xs mb-3">Valentine Mission</p>
-            <h1 className="text-4xl md:text-5xl font-black mb-4 text-slate-100">Ready for a little love quest?</h1>
-            <p className="text-slate-300 leading-relaxed mb-8">
-              Explore the map, choose your path, and unlock the final "yes." Beat the flowchart and claim your official valentine status.
-            </p>
-            <button
-              onClick={() => setHasGameStarted(true)}
-              className={getButtonClass('primary')}
-            >
-              Start the Adventure 💌
-            </button>
-          </div>
-        </div>
-      )}
-
-      {showCelebration && (
-        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/65 backdrop-blur-sm px-4">
-          <div className="w-full max-w-lg rounded-[2.5rem] border border-fuchsia-200/25 bg-slate-900/90 p-8 text-center shadow-[0_32px_80px_-20px_rgba(0,0,0,0.8)]">
-            <p className="text-fuchsia-300 font-semibold tracking-[0.2em] uppercase text-xs mb-3">Achievement Unlocked</p>
-            <h2 className="text-4xl font-black text-slate-100 mb-3">Valentine Secured 💖</h2>
-            <p className="text-slate-300 mb-6">You finished the journey and made it to the happiest ending. This moment deserves a victory lap.</p>
-            <div className="flex flex-col sm:flex-row justify-center gap-3">
-              <button onClick={() => setShowCelebration(false)} className={getButtonClass('primary')}>
-                Keep Exploring
-              </button>
-              <button onClick={handleRestart} className={getButtonClass('secondary')}>
-                Play Again
-              </button>
-            </div>
-          </div>
-        </div>
+        <button
+          onClick={() => setHasGameStarted(true)}
+          className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950/25 backdrop-blur-md text-fuchsia-200 text-lg md:text-xl font-bold tracking-wide transition-colors hover:text-fuchsia-100"
+        >
+          Press anywhere to start 💌
+        </button>
       )}
 
       <div
-        className="absolute inset-0 flex items-center justify-center pointer-events-none"
+        className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-500 ${hasGameStarted ? 'blur-0' : 'blur-sm'}`}
         style={cameraTransform}
       >
         <svg className="absolute overflow-visible w-full h-full opacity-30">
@@ -178,7 +146,7 @@ const App: React.FC = () => {
                     {step.options.map((opt, i) => (
                       <button
                         key={i}
-                        disabled={!isActive || isPanning}
+                        disabled={!isActive || isPanning || !hasGameStarted}
                         onClick={() => handleStepChange(opt.next)}
                         className={getButtonClass(opt.variant)}
                       >
@@ -196,6 +164,12 @@ const App: React.FC = () => {
       <div className="fixed top-8 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
         <div className="px-6 py-2 bg-slate-950/60 backdrop-blur-md rounded-full border border-fuchsia-100/15 text-fuchsia-300 font-bold text-sm tracking-tight shadow-sm">
           Mission Progress: {visitedSteps.size}/{Object.keys(FLOWCHART_STEPS).length} nodes discovered
+        </div>
+      </div>
+
+      <div className="fixed bottom-6 right-6 z-50 pointer-events-none">
+        <div className="px-4 py-2 bg-slate-950/60 backdrop-blur-md rounded-full border border-fuchsia-100/15 text-fuchsia-300 font-semibold text-xs md:text-sm tracking-tight shadow-sm">
+          Nodes discovered: {visitedSteps.size}/{Object.keys(FLOWCHART_STEPS).length}
         </div>
       </div>
     </div>
