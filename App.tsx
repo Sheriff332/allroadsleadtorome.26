@@ -206,7 +206,7 @@ const App: React.FC = () => {
         })}
       </div>
 
-      <div className="fixed top-8 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
         <div className="px-6 py-2 bg-slate-950/60 backdrop-blur-md rounded-full border border-fuchsia-100/15 text-fuchsia-300 font-bold text-sm tracking-tight shadow-sm">
           Mission Progress: {visitedSteps.size}/{Object.keys(FLOWCHART_STEPS).length} nodes discovered
         </div>
