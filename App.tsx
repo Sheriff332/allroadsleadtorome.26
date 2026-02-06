@@ -24,6 +24,13 @@ const App: React.FC = () => {
     setTimeout(() => setIsPanning(false), 800);
   }, []);
 
+  const handleRestart = useCallback(() => {
+    setCurrentStepId('start');
+    setVisitedSteps(new Set(['start']));
+    setShowCelebration(false);
+    setHasGameStarted(false);
+  }, []);
+
   const getButtonClass = (variant?: string) => {
     const base = 'px-6 py-3 rounded-full font-bold transition-all duration-300 text-sm md:text-base border active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed';
     if (variant === 'primary') {
@@ -156,7 +163,7 @@ const App: React.FC = () => {
 
       <div className="fixed top-8 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
         <div className="px-6 py-2 bg-slate-950/60 backdrop-blur-md rounded-full border border-fuchsia-100/15 text-fuchsia-300 font-bold text-sm tracking-tight shadow-sm">
-          Made with 💖 by yours truly
+          Mission Progress: {visitedSteps.size}/{Object.keys(FLOWCHART_STEPS).length} nodes discovered
         </div>
       </div>
 
